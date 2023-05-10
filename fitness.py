@@ -36,9 +36,9 @@ class Fit:
         return score *10000/count
         
 
-    def generateScore(self, sentance: str) -> None:
+    def generateScore(self, sentence: str) -> None:
         total = 0
-        words = sentance.split(" ")
+        words = sentence.split(" ")
         for word in words:
             total += self.__getWordScore(word)
 
