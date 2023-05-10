@@ -1,6 +1,6 @@
 import string
 import random
-import Person
+import Person, Mutations
 from Fitness import Fit
 
 class Population:
@@ -47,7 +47,12 @@ def generate_encoding_dict():
         return encoding_dict
 
 if __name__ == "__main__":
-    popy = Population(25, "xaac cbz")
+    popy = Population(25, "abcdefg hijklmnop qrs tuv wx yz")
+    
     for i in popy.population:
+        Mutations.switchMutation(i)
         print(i.new_dna)
         print(i.fitness)
+    
+
+
