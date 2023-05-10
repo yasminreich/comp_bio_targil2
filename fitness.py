@@ -43,7 +43,3 @@ class Fit:
             total += self.__getWordScore(word)
 
         return total/len(words)
-
-fit = Fit("dict.txt", "Letter2_Freq.txt")
-
-print(fit.generateScore("evj qejuclcea fz"))
