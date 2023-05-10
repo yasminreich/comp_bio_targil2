@@ -1,11 +1,11 @@
 
 class Person:
-    def __init__(self, original_dna, encoding_dict, num_generations):
+    def __init__(self, original_dna, encoding_dict, num_generations, fitness_func):
         self.original_dna = original_dna
         self.encoding_dict = encoding_dict | {' ': ' ', '\n ': '\n', ',': ',', '.': '.', ';': ';'}
         self.num_generations = num_generations
         self.new_dna = self.get_new_dna()
-        self.fitness = 0
+        self.fitness = fitness_func.generateScore(self.new_dna)
     
     #generate the new dna from the coded one using the dictionary
     def get_new_dna(self):

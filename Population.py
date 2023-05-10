@@ -1,11 +1,13 @@
 import string
 import random
 import Person
+from Fitness import Fit
 
 class Population:
     def __init__(self, population_size, code):
         self.size = population_size
         self.code_dna = code
+        self.fitness = Fit("dict.txt", "Letter2_Freq.txt")
         self.population = self.create_initial_population()
 
     def generate_encoding_dict(self):
@@ -27,7 +29,7 @@ class Population:
         people = []
         #create a population in size of random permutations
         for x in range(self.size):
-            people.append(Person.Person(self.code_dna, self.generate_encoding_dict(), 0))
+            people.append(Person.Person(self.code_dna, self.generate_encoding_dict(), 0, self.fitness))
         return people
     
 def generate_encoding_dict():
@@ -43,4 +45,9 @@ def generate_encoding_dict():
             encoding_dict[letter] = shuffled_letters[i]
 
         return encoding_dict
-    
+
+if __name__ == "__main__":
+    popy = Population(25, "xaac cbz")
+    for i in popy.population:
+        print(i.new_dna)
+        print(i.fitness)
