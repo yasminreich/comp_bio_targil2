@@ -44,6 +44,5 @@ def crossover(person1, person2):
     child2_dict = dict(zip(alphabet, child2_list))
     child1 = Person.Person(person1.original_dna, child1_dict, person1.num_generations + 1, person1.fitnessFunc)
     child2 = Person.Person(person1.original_dna, child2_dict, person1.num_generations + 1, person1.fitnessFunc)
-    print(random_cut)
     return child1, child2
 
