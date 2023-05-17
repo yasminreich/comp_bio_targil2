@@ -24,7 +24,9 @@ def replace_duplicate_letters(child):
     none_indices = [i for i in range(len(replaced_child)) if replaced_child[i] == None]
     remaining_letters = [letter for letter in alphabet if letter not in replaced_child]
     for index in none_indices:
-        replaced_child = replaced_child[:index] + [random.choice(remaining_letters)] + replaced_child[index+1:]
+        let = random.choice(remaining_letters)
+        replaced_child = replaced_child[:index] + [let] + replaced_child[index+1:]
+        remaining_letters.remove(let)
     return replaced_child
 
 def crossover(person1, person2):
@@ -40,7 +42,8 @@ def crossover(person1, person2):
     alphabet = string.ascii_lowercase
     child1_dict = dict(zip(alphabet, child1_list))
     child2_dict = dict(zip(alphabet, child2_list))
-    child1 = Person.Person(parent1.original_dna, child1_dict, parent1.num_generations + 1, parent1.fitnessFunc)
-    child2 = Person.Person(parent1.original_dna, child2_dict, parent1.num_generations + 1, parent1.fitnessFunc)
+    child1 = Person.Person(person1.original_dna, child1_dict, person1.num_generations + 1, person1.fitnessFunc)
+    child2 = Person.Person(person1.original_dna, child2_dict, person1.num_generations + 1, person1.fitnessFunc)
+    print(random_cut)
     return child1, child2
 
