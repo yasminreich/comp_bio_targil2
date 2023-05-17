@@ -4,6 +4,8 @@ def switchMutation(person: Person) -> None:
     keys = list(person.getEncodingDict().keys())
     key1, key2 = random.sample(keys, 2)
     person.getEncodingDict()[key1], person.getEncodingDict()[key2] = person.getEncodingDict()[key2], person.getEncodingDict()[key1]
+    person.new_dna = person.get_new_dna()
+    person.calculateFitness()
 
 def replace_duplicate_letters(child):
     # Create a set to keep track of previously seen letters
@@ -41,3 +43,4 @@ def crossover(person1, person2):
     child1 = Person.Person(parent1.original_dna, child1_dict, parent1.num_generations + 1, parent1.fitnessFunc)
     child2 = Person.Person(parent1.original_dna, child2_dict, parent1.num_generations + 1, parent1.fitnessFunc)
     return child1, child2
+
