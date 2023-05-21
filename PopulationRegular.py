@@ -120,11 +120,13 @@ class Population:
     
 if __name__ == "__main__":
     text = ""
-    with open('/Users/chenbistra/Documents/repos/comp_bio_targil2/enc.txt', 'r') as f:
+    with open('enc.txt', 'r') as f:
         text = f.read()
 
     text = re.sub(r"\s+", " ", text)
-
+    mutation_chance_values = [0.2, 0.4, 0.6, 0.8]
+    death_threshold_values = [10, 20, 40, 60]
+    population_size = [40, 60, 80, 100]
     popy = Population(60, text)
     # deathTreshold = 5
     # breakPoint=93
@@ -146,7 +148,11 @@ if __name__ == "__main__":
         #     print(popy.bestPerson.getFitness())
         #     print(popy.bestPerson.new_dna)
         #     break
-    print(popy.bestPerson.new_dna)
+    with open("plain.txt", 'w') as file:
+        file.write(popy.bestPerson.new_dna)
+    with open("perm.txt", 'w') as file:
+        for key, value in popy.bestPerson.getEncodingDict().items():
+            file.write(f"{key} {value}\n")
     print(generationCounter)
     
         
