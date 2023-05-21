@@ -40,28 +40,41 @@ class Population:
     # remove individuals with low fitness
     def __naturalSelection(self, percentileNum):
 
-        devidor = self.__getDevidor(percentileNum)
+        # devidor = self.__getDevidor(percentileNum)
         temp = []
-
-        for person in self.population:
-            if person.getFitness() > devidor:
-                temp.append(person)
-        
+        people_to_remove = int(self.size * 0.2)
+        temp = self.population[:self.size - people_to_remove]
         self.population = temp
 
-    def __getDevidor(self, percentileNum):
-        allFit = []
-        for person in self.population:
-            allFit.append(person.getFitness())
+        # for person in self.population:
+        #     if person.getFitness() >= devidor:
+        #         temp.append(person)
+        
+        # self.population = temp
 
-        arr = np.array(allFit)
-        return np.percentile(arr, percentileNum)
+    # def __getDevidor(self, percentileNum):
+    #     allFit = []
+    #     for person in self.population:
+    #         allFit.append(person.fitness)
+
+    #     arr = np.array(allFit)
+    #     return np.percentile(arr, percentileNum)
 
     def dispachBestPeople(self, bestPeople):
+        # newPop = []
+        # percentage = [5,4,3,2,1]
+        # for person, percent in zip(bestPeople, percentage):
+        #     amount = math.ceil((60/100)*percent)
+        #     for i in range(amount):
+        #         newPop.append(deepcopy(person))
+        
+        # return newPop
+
         newPop = []
         for person in bestPeople:
             # create new copies of the best individual (5% of the new population)
-            amount = math.ceil(person.getFitness()/10)
+            percent = person.getFitness()/10
+            amount = math.ceil((60/100)*percent)
             for i in range(amount):
                 newPop.append(deepcopy(self.bestPerson))
         
@@ -69,7 +82,7 @@ class Population:
 
 
     def nextGen(self, mutationChance, deathThreshold):
-
+        self.population = sorted(self.population, key=lambda p: p.fitness, reverse=True)
         # Remove individuals with low fitness
         self.__naturalSelection(deathThreshold)
         
@@ -77,11 +90,11 @@ class Population:
         # get the individual with the best fitness and then remove it from the current population
         # self.bestPerson = self.__getBestPerson()
 
-        sortedPeople = sorted(self.population, key=lambda p: p.fitness, reverse=True)[:5]
+        
+        self.bestPerson = self.population[0]
 
-        self.bestPerson = sortedPeople[0]
 
-        newPopulation = self.dispachBestPeople(sortedPeople)
+        newPopulation = self.dispachBestPeople(self.population[:5])
 
         
         # go through the remaining population and do crossover 
@@ -103,10 +116,7 @@ class Population:
             # if person.getFitness() < devidor and random.random() < mutationChance:
             if random.random() < mutationChance:
                 Mutations.switchMutation(person)
-
-
-
-        
+     
     
 if __name__ == "__main__":
     text = ""
@@ -117,17 +127,28 @@ if __name__ == "__main__":
 
     popy = Population(60, text)
     # deathTreshold = 5
-    breakPoint=93
+    # breakPoint=93
+    convergenceMax = 10
+    convergenceCount = 0
     generationCounter = 0
-    while True:
+    lastBestFit = 0
+    while convergenceCount < convergenceMax:
         generationCounter += 1
         popy.nextGen(mutationChance=0.6, deathThreshold=20)
-        print("best person fitness:", float(popy.bestPerson.getFitness()))
-        if popy.bestPerson.getFitness() >= breakPoint:
-            print(popy.bestPerson.getFitness())
-            print(popy.bestPerson.new_dna)
-            break
+        print("best person fitness:", float(popy.bestPerson.fitness))
+        if popy.bestPerson.fitness == lastBestFit:
+            convergenceCount += 1
+        else:
+            convergenceCount = 0
+        lastBestFit = popy.bestPerson.fitness
+
+        # if popy.bestPerson.getFitness() >= breakPoint:
+        #     print(popy.bestPerson.getFitness())
+        #     print(popy.bestPerson.new_dna)
+        #     break
+    print(popy.bestPerson.new_dna)
     print(generationCounter)
+    
         
 
 
