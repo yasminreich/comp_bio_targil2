@@ -1,7 +1,6 @@
 import random, string, re, math
 import Person, Mutations
 from Fitness import Fit
-from copy import deepcopy
 import numpy as np
 from multiprocessing import Pool
 
@@ -38,37 +37,17 @@ class Population:
     
 
     # remove individuals with low fitness
-    def __naturalSelection(self, percentileNum):
+    def __naturalSelection(self, percent):
 
         # devidor = self.__getDevidor(percentileNum)
         temp = []
-        people_to_remove = int(self.size * 0.2)
+        people_to_remove = int(self.size * percent)
         temp = self.population[:self.size - people_to_remove]
         self.population = temp
 
-        # for person in self.population:
-        #     if person.getFitness() >= devidor:
-        #         temp.append(person)
-        
-        # self.population = temp
-
-    # def __getDevidor(self, percentileNum):
-    #     allFit = []
-    #     for person in self.population:
-    #         allFit.append(person.fitness)
-
-    #     arr = np.array(allFit)
-    #     return np.percentile(arr, percentileNum)
 
     def dispachBestPeople(self, bestPeople):
-        # newPop = []
-        # percentage = [5,4,3,2,1]
-        # for person, percent in zip(bestPeople, percentage):
-        #     amount = math.ceil((60/100)*percent)
-        #     for i in range(amount):
-        #         newPop.append(deepcopy(person))
-        
-        # return newPop
+
 
         newPop = []
         for person in bestPeople:
@@ -76,12 +55,12 @@ class Population:
             percent = person.getFitness()/10
             amount = math.ceil((60/100)*percent)
             for i in range(amount):
-                newPop.append(deepcopy(self.bestPerson))
+                newPop.append(self.bestPerson.deepcopy())
         
         return newPop
 
 
-    def nextGen(self, mutationChance, deathThreshold):
+    def nextGen(self, mutationChance, deathThreshold, localOpositions):
         self.population = sorted(self.population, key=lambda p: p.fitness, reverse=True)
         # Remove individuals with low fitness
         self.__naturalSelection(deathThreshold)
@@ -107,8 +86,6 @@ class Population:
             newPopulation.append(child2)
             if len(newPopulation) == self.size:
                 break
-        
-
 
         self.population = newPopulation
         
@@ -116,6 +93,16 @@ class Population:
             # if person.getFitness() < devidor and random.random() < mutationChance:
             if random.random() < mutationChance:
                 Mutations.switchMutation(person)
+        
+        for person in self.population:
+            newPerson = person.deepcopy()
+            for i in range(localOpositions):
+                Mutations.switchMutation(newPerson)
+            
+            if newPerson.fitness > person.fitness:
+                person.fitness = newPerson.fitness
+                person.new_dna = newPerson.new_dna
+                person.encoding_dict = newPerson.encoding_dict
      
     
 if __name__ == "__main__":
@@ -134,7 +121,7 @@ if __name__ == "__main__":
     lastBestFit = 0
     while convergenceCount < convergenceMax:
         generationCounter += 1
-        popy.nextGen(mutationChance=0.6, deathThreshold=20)
+        popy.nextGen(mutationChance=0.6, deathThreshold=0.2, localOpositions=5)
         print("best person fitness:", float(popy.bestPerson.fitness))
         if popy.bestPerson.fitness == lastBestFit:
             convergenceCount += 1
@@ -147,7 +134,8 @@ if __name__ == "__main__":
         #     print(popy.bestPerson.new_dna)
         #     break
     print(popy.bestPerson.new_dna)
-    print(generationCounter)
+    print("number of generations:", generationCounter)
+    print("number of calls to fit:", popy.fitness.fitnessCallCount)
     
         
 

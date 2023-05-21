@@ -1,7 +1,6 @@
 import random, string, re, math
 import Person, Mutations
 from Fitness import Fit
-from copy import deepcopy
 import numpy as np
 from multiprocessing import Pool
 
@@ -38,45 +37,24 @@ class Population:
     
 
     # remove individuals with low fitness
-    def __naturalSelection(self, percentileNum):
+    def __naturalSelection(self, percent):
 
         # devidor = self.__getDevidor(percentileNum)
         temp = []
-        people_to_remove = int(self.size * 0.2)
+        people_to_remove = int(self.size * percent)
         temp = self.population[:self.size - people_to_remove]
         self.population = temp
 
-        # for person in self.population:
-        #     if person.getFitness() >= devidor:
-        #         temp.append(person)
-        
-        # self.population = temp
-
-    # def __getDevidor(self, percentileNum):
-    #     allFit = []
-    #     for person in self.population:
-    #         allFit.append(person.fitness)
-
-    #     arr = np.array(allFit)
-    #     return np.percentile(arr, percentileNum)
-
     def dispachBestPeople(self, bestPeople):
-        # newPop = []
-        # percentage = [5,4,3,2,1]
-        # for person, percent in zip(bestPeople, percentage):
-        #     amount = math.ceil((60/100)*percent)
-        #     for i in range(amount):
-        #         newPop.append(deepcopy(person))
-        
-        # return newPop
+
 
         newPop = []
         for person in bestPeople:
             # create new copies of the best individual (5% of the new population)
-            percent = person.getFitness()/10
+            percent = person.fitness/10
             amount = math.ceil((60/100)*percent)
             for i in range(amount):
-                newPop.append(deepcopy(self.bestPerson))
+                newPop.append(self.bestPerson.deepcopy())
         
         return newPop
 
@@ -85,10 +63,6 @@ class Population:
         self.population = sorted(self.population, key=lambda p: p.fitness, reverse=True)
         # Remove individuals with low fitness
         self.__naturalSelection(deathThreshold)
-        
-
-        # get the individual with the best fitness and then remove it from the current population
-        # self.bestPerson = self.__getBestPerson()
 
         
         self.bestPerson = self.population[0]
@@ -107,8 +81,6 @@ class Population:
             newPopulation.append(child2)
             if len(newPopulation) == self.size:
                 break
-        
-
 
         self.population = newPopulation
         
@@ -120,13 +92,11 @@ class Population:
     
 if __name__ == "__main__":
     text = ""
-    with open('enc.txt', 'r') as f:
+    with open('/Users/chenbistra/Documents/repos/comp_bio_targil2/enc.txt', 'r') as f:
         text = f.read()
 
     text = re.sub(r"\s+", " ", text)
-    mutation_chance_values = [0.2, 0.4, 0.6, 0.8]
-    death_threshold_values = [10, 20, 40, 60]
-    population_size = [40, 60, 80, 100]
+
     popy = Population(60, text)
     # deathTreshold = 5
     # breakPoint=93
@@ -136,7 +106,7 @@ if __name__ == "__main__":
     lastBestFit = 0
     while convergenceCount < convergenceMax:
         generationCounter += 1
-        popy.nextGen(mutationChance=0.6, deathThreshold=20)
+        popy.nextGen(mutationChance=0.6, deathThreshold=0.2)
         print("best person fitness:", float(popy.bestPerson.fitness))
         if popy.bestPerson.fitness == lastBestFit:
             convergenceCount += 1
@@ -144,17 +114,13 @@ if __name__ == "__main__":
             convergenceCount = 0
         lastBestFit = popy.bestPerson.fitness
 
-        # if popy.bestPerson.getFitness() >= breakPoint:
-        #     print(popy.bestPerson.getFitness())
-        #     print(popy.bestPerson.new_dna)
-        #     break
+
     with open("plain.txt", 'w') as file:
         file.write(popy.bestPerson.new_dna)
     with open("perm.txt", 'w') as file:
         for key, value in popy.bestPerson.getEncodingDict().items():
             file.write(f"{key} {value}\n")
     print(generationCounter)
-    
         
 
 
