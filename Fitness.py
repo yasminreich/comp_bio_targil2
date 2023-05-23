@@ -1,6 +1,8 @@
 import re, math
 import numpy as np
 from Levenshtein import distance
+import concurrent.futures
+
 
 class Fit:
     def __init__(self, pathToDict, pathToFreq2):
@@ -30,7 +32,7 @@ class Fit:
 
 
 
-    def __getWordScore(self, word):
+    def getWordScore(self, word):
         levDistance = 0
         wordLen = len(word)
         if wordLen in self.dictWords:
@@ -50,12 +52,36 @@ class Fit:
         valid_subwords = [subword for subword in subwords if all(symbol not in subword for symbol in (",", ".", ";"))]
         scores = np.array([self.freq2.get(subword, 1e-6) for subword in valid_subwords])
         score = np.sum(scores) * 1000
-
         return score / count
-
 
     def generateScore(self, individual):
         self.fitnessCallCount += 1
         words = individual.split()
-        scores = np.array([self.__getWordScore(word) for word in words])
+
+        # Create a ThreadPoolExecutor with the desired number of threads
+        with concurrent.futures.ThreadPoolExecutor(10) as executor:
+            # Map the getWordScore method to the list of words using multiple threads
+            scores = list(executor.map(self.getWordScore, words))
+
         return np.mean(scores)
+
+    # def generateScore(self, individual):
+    #     self.fitnessCallCount += 1
+    #     words = individual.split()
+
+    #     # Create a pool of worker processes
+    #     pool = Pool(1)
+
+    #     # Map the __getWordScore function to the list of words using multiple processes
+    #     scores = pool.map(self.getWordScore, words)
+
+    #     # Close the pool to prevent any more tasks from being submitted
+    #     pool.close()
+
+    #     return np.mean(scores)
+
+    # def generateScore(self, individual):
+    #     self.fitnessCallCount += 1
+    #     words = individual.split()
+    #     scores = np.array([self.getWordScore(word) for word in words])
+    #     return np.mean(scores)

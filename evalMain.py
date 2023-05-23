@@ -11,9 +11,12 @@ if __name__ == "__main__":
     with open('enc.txt', 'r') as f:
         text = f.read()
     text = re.sub(r"\s+", " ", text)
-    population_size_values = [40, 60, 80, 100]
+    # population_size_values = [40, 60, 80, 100]
+    # mutation_chance_values = [0.2, 0.4, 0.6]
+    # death_threshold_values = [0.1, 0.2, 0.6]
+    population_size_values = [100]
     mutation_chance_values = [0.2, 0.4, 0.6]
-    death_threshold_values = [10, 20, 60]
+    death_threshold_values = [0.1, 0.2, 0.6]
     for p in population_size_values:
          for m in mutation_chance_values:
               for d in death_threshold_values:
