@@ -17,20 +17,21 @@ if __name__ == "__main__":
     for p in population_size_values:
          for m in mutation_chance_values:
               for d in death_threshold_values:
-                popy = Population(p, text)
-                convergenceMax = 10
-                convergenceCount = 0
-                generationCounter = 0
-                lastBestFit = 0
-                while convergenceCount < convergenceMax:
-                    generationCounter += 1
-                    popy.nextGen(mutationChance=m, deathThreshold=d)
-                    print("best person fitness:", float(popy.bestPerson.fitness))
-                    if popy.bestPerson.fitness == lastBestFit:
-                        convergenceCount += 1
-                    else:
-                        convergenceCount = 0
-                    lastBestFit = popy.bestPerson.fitness
-                with open("regular.csv", mode='a', newline='') as csvfile:
-                            writer = csv.writer(csvfile)
-                            writer.writerow([p, m, d, generationCounter, popy.fitness.fitnessCallCount, popy.bestPerson.fitness])
+                for i in range(3):
+                    popy = Population(p, text)
+                    convergenceMax = 10
+                    convergenceCount = 0
+                    generationCounter = 0
+                    lastBestFit = 0
+                    while convergenceCount < convergenceMax:
+                        generationCounter += 1
+                        popy.nextGen(mutationChance=m, deathThreshold=d)
+                        print("best person fitness:", float(popy.bestPerson.fitness))
+                        if popy.bestPerson.fitness == lastBestFit:
+                            convergenceCount += 1
+                        else:
+                            convergenceCount = 0
+                        lastBestFit = popy.bestPerson.fitness
+                    with open("regular.csv", mode='a', newline='') as csvfile:
+                                writer = csv.writer(csvfile)
+                                writer.writerow([p, m, d, generationCounter, popy.fitness.fitnessCallCount, popy.bestPerson.fitness])
