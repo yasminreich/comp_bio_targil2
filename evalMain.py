@@ -6,24 +6,19 @@ import csv
 if __name__ == "__main__":
     with open("regular.csv", mode='w', newline='') as csvfile:
         writer = csv.writer(csvfile)
-        writer.writerow(['population_size', 'motation_chance', 'death_treshold', 'generation_num', "best_fit"])
+        writer.writerow(['population_size', 'motation_chance', 'death_treshold', 'generation_num','calls_to_fit', 'best_fit'])
     text = ""
     with open('enc.txt', 'r') as f:
         text = f.read()
     text = re.sub(r"\s+", " ", text)
-    # population_size_values = [40, 60, 80, 100]
-    # mutation_chance_values = [0.2, 0.4, 0.6]
-    # death_threshold_values = [0.1, 0.2, 0.6]
-    population_size_values = [100]
-    mutation_chance_values = [0.2, 0.4, 0.6]
-    death_threshold_values = [0.1, 0.2, 0.6]
+    population_size_values = [40, 60, 80, 100, 150]
+    mutation_chance_values = [0.2, 0.4, 0.6, 0.8]
+    death_threshold_values = [10, 20, 40, 60, 80]
     for p in population_size_values:
          for m in mutation_chance_values:
               for d in death_threshold_values:
-                for i in range(10):
+                for i in range(3):
                     popy = Population(p, text)
-                    # deathTreshold = 5
-                    # breakPoint=93
                     convergenceMax = 10
                     convergenceCount = 0
                     generationCounter = 0
@@ -39,4 +34,4 @@ if __name__ == "__main__":
                         lastBestFit = popy.bestPerson.fitness
                     with open("regular.csv", mode='a', newline='') as csvfile:
                                 writer = csv.writer(csvfile)
-                                writer.writerow([p, m, d, generationCounter, popy.bestPerson.fitness])
+                                writer.writerow([p, m, d, generationCounter, popy.fitness.fitnessCallCount, popy.bestPerson.fitness])
