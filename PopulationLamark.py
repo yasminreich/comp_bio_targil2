@@ -75,10 +75,15 @@ class Population:
 
         newPopulation = self.dispachBestPeople(self.population[:5])
 
-        
+        popForCros = []
+        # create vector of people for the crossover
+        for person in self.population:
+            for _ in range(int(person.fitness)):
+                popForCros.append(person.deepcopy())
+
         # go through the remaining population and do crossover 
         while True:
-            parent1, parent2 = random.sample(self.population, 2)
+            parent1, parent2 = random.sample(popForCros, 2)
             child1, child2 = Mutations.crossover(parent1, parent2)
             newPopulation.append(child1)
             if len(newPopulation) == self.size:
