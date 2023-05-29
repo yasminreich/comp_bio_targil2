@@ -4,8 +4,7 @@ from Fitness import Fit
 import numpy as np
 from multiprocessing import Pool
 import matplotlib.pyplot as plt
-
-
+import csv
 
 class Population:
     def __init__(self, population_size, code):
@@ -96,54 +95,65 @@ class Population:
             # if person.getFitness() < devidor and random.random() < mutationChance:
             if random.random() < mutationChance:
                 Mutations.switchMutation(person)
+                person.calculateFitness()
      
     
-if __name__ == "__main__":
-    text = ""
-    with open('/Users/chenbistra/Documents/repos/comp_bio_targil2/enc.txt', 'r') as f:
-        text = f.read()
+# if __name__ == "__main__":
+#     text = ""
+#     with open('/Users/chenbistra/Documents/repos/comp_bio_targil2/enc.txt', 'r') as f:
+#         text = f.read()
 
-    text = re.sub(r"\s+", " ", text)
+#     text = re.sub(r"\s+", " ", text)
+#     populationSize = 40
+#     mutationChance = 0.4
+#     deathThreshold = 0.8
+#     popy = Population(populationSize, text)
+#     # deathTreshold = 5
+#     # breakPoint=93
+#     convergenceMax = 10
+#     convergenceCount = 0
+#     generationCounter = 0
+#     lastBestFit = 0
+#     graph = {}
+#     while convergenceCount < convergenceMax:
+#         generationCounter += 1
+#         popy.nextGen(mutationChance=mutationChance, deathThreshold=deathThreshold)
+#         print("best person fitness:", float(popy.bestPerson.fitness))
+#         if popy.bestPerson.fitness == lastBestFit:
+#             convergenceCount += 1
+#         else:
+#             convergenceCount = 0
+#         lastBestFit = popy.bestPerson.fitness
+#         graph[generationCounter] = lastBestFit
 
-    popy = Population(40, text)
-    # deathTreshold = 5
-    # breakPoint=93
-    convergenceMax = 10
-    convergenceCount = 0
-    generationCounter = 0
-    lastBestFit = 0
-    graph = {}
-    while convergenceCount < convergenceMax:
-        generationCounter += 1
-        popy.nextGen(mutationChance=0.4, deathThreshold=0.8)
-        print("best person fitness:", float(popy.bestPerson.fitness))
-        if popy.bestPerson.fitness == lastBestFit:
-            convergenceCount += 1
-        else:
-            convergenceCount = 0
-        lastBestFit = popy.bestPerson.fitness
-        graph[generationCounter] = lastBestFit
 
-
-    with open("plain.txt", 'w') as file:
-        file.write(popy.bestPerson.new_dna)
-    with open("perm.txt", 'w') as file:
-        for key, value in popy.bestPerson.getEncodingDict().items():
-            file.write(f"{key} {value}\n")
+#     with open("plain.txt", 'w') as file:
+#         file.write(popy.bestPerson.new_dna)
+#     with open("perm.txt", 'w') as file:
+#         for key, value in popy.bestPerson.getEncodingDict().items():
+#             file.write(f"{key} {value}\n")
     
-    print(generationCounter)
-    print(popy.fitness.fitnessCallCount)
-    print(popy.bestPerson.new_dna)
+#     print(generationCounter)
+#     print(popy.fitness.fitnessCallCount)
+#     print(popy.bestPerson.new_dna)
 
-    x_values = list(graph.keys())
-    y_values = list(graph.values())
+#     with open("regular best graph.csv", mode='w', newline='') as csvfile:
+#         writer = csv.writer(csvfile)
+#         writer.writerow(['generation', "best_fit"])
+#         for gen, fit in zip(graph.keys(), graph.values()):
+#             writer.writerow([gen, fit])
+    
 
-    plt.plot(x_values, y_values)
-    plt.xlabel('Generation')
-    plt.ylabel('Best Fitness')
-    plt.title('Best Fitness Per Generation')
-    plt.show()
-        
+#     x_values = list(graph.keys())
+#     y_values = list(graph.values())
+
+#     plt.plot(x_values, y_values)
+#     plt.xlabel('Generation')
+#     plt.ylabel('Best Fitness')
+#     plt.title('Regular Run Best Fitness Per Generation With Parameters:\
+#         \nPopulation Size={}    Mutation Chance={}    Death Threshold={}'.format(populationSize, mutationChance, deathThreshold))
+#     plt.show()
+    
 
 
 

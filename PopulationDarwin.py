@@ -5,13 +5,13 @@ import Person
 import Mutations
 from Fitness import Fit
 import matplotlib.pyplot as plt
-
+import csv
 
 class Population:
-    def __init__(self, population_size, code, fitness):
+    def __init__(self, population_size, code):
         self.size = population_size
         self.code_dna = code
-        self.fitness = fitness
+        self.fitness = Fit("dict.txt", "Letter2_Freq.txt", "CalculatedWords.json")
         self.population = self.create_initial_population()
 
     def generate_encoding_dict(self):
@@ -71,6 +71,7 @@ class Population:
             newPerson = person.deepcopy()
             for i in range(localOpositions):
                 Mutations.switchMutation(newPerson)
+            newPerson.calculateFitness()
             
             if newPerson.fitness > person.fitness:
                 person.fitness = newPerson.fitness
@@ -112,7 +113,11 @@ if __name__ == "__main__":
 
     text = re.sub(r"\s+", " ", text)
 
-    popy = Population(60, text)
+    populationSize = 100
+    mutationChance = 0.4
+    deathThreshold = 0.2
+    localOpositions = 1
+    popy = Population(populationSize, text)
 
     convergenceMax = 10
     convergenceCount = 0
@@ -122,7 +127,7 @@ if __name__ == "__main__":
 
     while convergenceCount < convergenceMax:
         generationCounter += 1
-        popy.nextGen(mutationChance=0.6, deathThreshold=0.2, localOpositions = 5)
+        popy.nextGen(mutationChance=mutationChance, deathThreshold=deathThreshold, localOpositions=localOpositions)
         print("best person fitness:", float(popy.bestPerson.fitness))
         if popy.bestPerson.fitness == lastBestFit:
             convergenceCount += 1
@@ -134,6 +139,12 @@ if __name__ == "__main__":
     print(popy.bestPerson.new_dna)
     print("number of generations:", generationCounter)
     print("number of calls to fit:", popy.fitness.fitnessCallCount)
+
+    with open("darwin amin graph.csv", mode='w', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(['generation', "best_fit"])
+        for gen, fit in zip(graph.keys(), graph.values()):
+            writer.writerow([gen, fit])
 
     x_values = list(graph.keys())
     y_values = list(graph.values())

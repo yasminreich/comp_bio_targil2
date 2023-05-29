@@ -5,7 +5,7 @@ def switchMutation(person: Person) -> None:
     key1, key2 = random.sample(keys, 2)
     person.getEncodingDict()[key1], person.getEncodingDict()[key2] = person.getEncodingDict()[key2], person.getEncodingDict()[key1]
     person.new_dna = person.get_new_dna()
-    person.calculateFitness()
+    # person.calculateFitness()
 
 def replace_duplicate_letters(child):
     # Create a set to keep track of previously seen letters

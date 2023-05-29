@@ -3,7 +3,7 @@ from PopulationDarwin import Population
 import csv, Fitness
 
 if __name__ == "__main__":
-    temp = 0.2
+    temp = 0.8
     # with open("darwin_{}.csv".format(temp), mode='w', newline='') as csvfile:
     #     writer = csv.writer(csvfile)
     #     writer.writerow(['population_size', 'motation_chance', "n_opt",'death_treshold', 'generation_num','calls_to_fit', 'best_fit', ])
@@ -11,17 +11,17 @@ if __name__ == "__main__":
     with open('enc.txt', 'r') as f:
         text = f.read()
     text = re.sub(r"\s+", " ", text)
-    population_size_values = [100]
+    population_size_values = [40, 60, 80, 100]
     mutation_chance_values = [0.2, 0.4, 0.6, 0.8]
     death_threshold_values = [temp]
     local_ops = [1,3,5]
-    fit = Fitness.Fit("dict.txt", "Letter2_Freq.txt", "CalculatedWords.json")
+    # fit = Fitness.Fit("dict.txt", "Letter2_Freq.txt", "CalculatedWords.json")
     for p in population_size_values:
          for m in mutation_chance_values:
               for d in death_threshold_values:
                 for l in local_ops:
-                    for i in range(7):
-                        popy = Population(p, text, fit)
+                    for i in range(2):
+                        popy = Population(p, text)
                         convergenceMax = 10
                         convergenceCount = 0
                         generationCounter = 0

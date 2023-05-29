@@ -4,13 +4,13 @@ from Fitness import Fit
 import numpy as np
 from multiprocessing import Pool
 import matplotlib.pyplot as plt
-
+import csv
 
 class Population:
-    def __init__(self, population_size, code, fitness):
+    def __init__(self, population_size, code):
         self.size = population_size
         self.code_dna = code
-        self.fitness = fitness
+        self.fitness = Fit("dict.txt", "Letter2_Freq.txt", "CalculatedWords.json")
         self.population = self.create_initial_population()
 
 
@@ -70,9 +70,12 @@ class Population:
             newPerson = person.deepcopy()
             for i in range(localOpositions):
                 Mutations.switchMutation(newPerson)
+            newPerson.calculateFitness()
             
             if newPerson.fitness > person.fitness:
                 person.fitness = newPerson.fitness
+                person.new_dna = newPerson.new_dna
+                person.encoding_dict = newPerson.encoding_dict
 
         
         self.bestPerson = self.population[0]
@@ -101,17 +104,8 @@ class Population:
             # if person.getFitness() < devidor and random.random() < mutationChance:
             if random.random() < mutationChance:
                 Mutations.switchMutation(person)
-        
-        for person in self.population:
-            newPerson = person.deepcopy()
-            for i in range(localOpositions):
-                Mutations.switchMutation(newPerson)
-            
-            if newPerson.fitness > person.fitness:
-                person.fitness = newPerson.fitness
-                person.new_dna = newPerson.new_dna
-                person.encoding_dict = newPerson.encoding_dict
-     
+                person.calculateFitness()
+             
     
 if __name__ == "__main__":
     text = ""
@@ -120,7 +114,12 @@ if __name__ == "__main__":
 
     text = re.sub(r"\s+", " ", text)
 
-    popy = Population(20, text)
+    populationSize = 40
+    mutationChance = 0.6
+    deathThreshold = 0.6
+    localOpositions = 10
+
+    popy = Population(populationSize, text)
 
     convergenceMax = 10
     convergenceCount = 0
@@ -129,7 +128,7 @@ if __name__ == "__main__":
     graph = {}
     while convergenceCount < convergenceMax:
         generationCounter += 1
-        popy.nextGen(mutationChance=0.6, deathThreshold=0.2, localOpositions=5)
+        popy.nextGen(mutationChance=mutationChance, deathThreshold=deathThreshold, localOpositions=localOpositions)
         print("best person fitness:", float(popy.bestPerson.fitness))
         if popy.bestPerson.fitness == lastBestFit:
             convergenceCount += 1
@@ -145,7 +144,13 @@ if __name__ == "__main__":
     print(popy.bestPerson.new_dna)
     print("number of generations:", generationCounter)
     print("number of calls to fit:", popy.fitness.fitnessCallCount)
-    
+
+
+    with open("lamark amin graph.csv", mode='w', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(['generation', "best_fit"])
+        for gen, fit in zip(graph.keys(), graph.values()):
+            writer.writerow([gen, fit])    
 
     x_values = list(graph.keys())
     y_values = list(graph.values())
