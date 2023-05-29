@@ -5,10 +5,7 @@ class Person:
         self.original_dna = original_dna
         self.encoding_dict = encoding_dict
         self.num_generations = num_generations
-        
         self.fitnessFunc = fitnessFunc
-
-    
         if new_dna == None:
             self.new_dna = self.get_new_dna()
         else:

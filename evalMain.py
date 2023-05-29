@@ -4,7 +4,8 @@ from PopulationRegular import Population
 import csv
 
 if __name__ == "__main__":
-    with open("regular.csv", mode='w', newline='') as csvfile:
+    temp = 0.8
+    with open("regular_{}.csv".format(temp), mode='w', newline='') as csvfile:
         writer = csv.writer(csvfile)
         writer.writerow(['population_size', 'motation_chance', 'death_treshold', 'generation_num','calls_to_fit', 'best_fit'])
     text = ""
@@ -13,11 +14,11 @@ if __name__ == "__main__":
     text = re.sub(r"\s+", " ", text)
     population_size_values = [40, 60, 80, 100, 150]
     mutation_chance_values = [0.2, 0.4, 0.6, 0.8]
-    death_threshold_values = [10, 20, 40, 60, 80]
+    death_threshold_values = [temp]
     for p in population_size_values:
          for m in mutation_chance_values:
               for d in death_threshold_values:
-                for i in range(3):
+                for i in range(10):
                     popy = Population(p, text)
                     convergenceMax = 10
                     convergenceCount = 0
@@ -26,12 +27,12 @@ if __name__ == "__main__":
                     while convergenceCount < convergenceMax:
                         generationCounter += 1
                         popy.nextGen(mutationChance=m, deathThreshold=d)
-                        print("best person fitness:", float(popy.bestPerson.fitness))
                         if popy.bestPerson.fitness == lastBestFit:
                             convergenceCount += 1
                         else:
                             convergenceCount = 0
                         lastBestFit = popy.bestPerson.fitness
-                    with open("regular.csv", mode='a', newline='') as csvfile:
+                    with open("regular_{}.csv".format(temp), mode='a', newline='') as csvfile:
                                 writer = csv.writer(csvfile)
                                 writer.writerow([p, m, d, generationCounter, popy.fitness.fitnessCallCount, popy.bestPerson.fitness])
+                    # popy.fitness.calcWordsToJson()

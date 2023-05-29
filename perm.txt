@@ -12,7 +12,7 @@ k b
 l l
 m d
 n u
-o k
+o w
 p m
 q s
 r v
@@ -20,7 +20,7 @@ s p
 t q
 u r
 v h
-w w
+w k
 x g
 y a
 z f
