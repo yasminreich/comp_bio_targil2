@@ -3,13 +3,15 @@ import Person, Mutations
 from Fitness import Fit
 import numpy as np
 from multiprocessing import Pool
+import matplotlib.pyplot as plt
+
 
 
 class Population:
     def __init__(self, population_size, code):
         self.size = population_size
         self.code_dna = code
-        self.fitness = Fit("dict.txt", "Letter2_Freq.txt")
+        self.fitness = Fit("dict.txt", "Letter2_Freq.txt", "CalculatedWords.json")
         self.population = self.create_initial_population()
 
 
@@ -52,7 +54,7 @@ class Population:
         for person in bestPeople:
             # create new copies of the best individual (5% of the new population)
             percent = person.fitness/10
-            amount = math.ceil((60/100)*percent)
+            amount = math.ceil((self.size/100)*percent)
             for i in range(amount):
                 newPop.append(self.bestPerson.deepcopy())
         
@@ -103,22 +105,24 @@ if __name__ == "__main__":
 
     text = re.sub(r"\s+", " ", text)
 
-    popy = Population(60, text)
+    popy = Population(40, text)
     # deathTreshold = 5
     # breakPoint=93
     convergenceMax = 10
     convergenceCount = 0
     generationCounter = 0
     lastBestFit = 0
+    graph = {}
     while convergenceCount < convergenceMax:
         generationCounter += 1
-        popy.nextGen(mutationChance=0.6, deathThreshold=0.2)
+        popy.nextGen(mutationChance=0.4, deathThreshold=0.8)
         print("best person fitness:", float(popy.bestPerson.fitness))
         if popy.bestPerson.fitness == lastBestFit:
             convergenceCount += 1
         else:
             convergenceCount = 0
         lastBestFit = popy.bestPerson.fitness
+        graph[generationCounter] = lastBestFit
 
 
     with open("plain.txt", 'w') as file:
@@ -126,8 +130,19 @@ if __name__ == "__main__":
     with open("perm.txt", 'w') as file:
         for key, value in popy.bestPerson.getEncodingDict().items():
             file.write(f"{key} {value}\n")
+    
     print(generationCounter)
     print(popy.fitness.fitnessCallCount)
+    print(popy.bestPerson.new_dna)
+
+    x_values = list(graph.keys())
+    y_values = list(graph.values())
+
+    plt.plot(x_values, y_values)
+    plt.xlabel('Generation')
+    plt.ylabel('Best Fitness')
+    plt.title('Best Fitness Per Generation')
+    plt.show()
         
 
 

@@ -4,13 +4,14 @@ import math,re
 import Person
 import Mutations
 from Fitness import Fit
+import matplotlib.pyplot as plt
 
 
 class Population:
-    def __init__(self, population_size, code):
+    def __init__(self, population_size, code, fitness):
         self.size = population_size
         self.code_dna = code
-        self.fitness = Fit("dict.txt", "Letter2_Freq.txt")
+        self.fitness = fitness
         self.population = self.create_initial_population()
 
     def generate_encoding_dict(self):
@@ -51,7 +52,7 @@ class Population:
         for person in bestPeople:
             # create new copies of the best individual (5% of the new population)
             percent = person.getFitness()/10
-            amount = math.ceil((60/100)*percent)
+            amount = math.ceil((self.size/100)*percent)
             for i in range(amount):
                 newPop.append(self.bestPerson.deepcopy())
 
@@ -60,12 +61,19 @@ class Population:
 
     def nextGen(self, mutationChance, deathThreshold, localOpositions):
         
-        self.population = sorted(
-            self.population, key=lambda p: p.fitness, reverse=True)
+        self.population = sorted(self.population, key=lambda p: p.fitness, reverse=True)
         
 
         # Remove individuals with low fitness
         self.__naturalSelection(deathThreshold)
+
+        for person in self.population:
+            newPerson = person.deepcopy()
+            for i in range(localOpositions):
+                Mutations.switchMutation(newPerson)
+            
+            if newPerson.fitness > person.fitness:
+                person.fitness = newPerson.fitness
 
         self.bestPerson = self.population[0]
 
@@ -96,14 +104,6 @@ class Population:
             if random.random() < mutationChance:
                 Mutations.switchMutation(person)
 
-
-        for person in self.population:
-            newPerson = person.deepcopy()
-            for i in range(localOpositions):
-                Mutations.switchMutation(newPerson)
-            
-            if newPerson.fitness > person.fitness:
-                person.fitness = newPerson.fitness
             
 if __name__ == "__main__":
     text = ""
@@ -118,6 +118,8 @@ if __name__ == "__main__":
     convergenceCount = 0
     generationCounter = 0
     lastBestFit = 0
+    graph = {}
+
     while convergenceCount < convergenceMax:
         generationCounter += 1
         popy.nextGen(mutationChance=0.6, deathThreshold=0.2, localOpositions = 5)
@@ -127,7 +129,17 @@ if __name__ == "__main__":
         else:
             convergenceCount = 0
         lastBestFit = popy.bestPerson.fitness
+        graph[generationCounter] = lastBestFit
 
     print(popy.bestPerson.new_dna)
     print("number of generations:", generationCounter)
     print("number of calls to fit:", popy.fitness.fitnessCallCount)
+
+    x_values = list(graph.keys())
+    y_values = list(graph.values())
+
+    plt.plot(x_values, y_values)
+    plt.xlabel('Generation')
+    plt.ylabel('Best Fitness')
+    plt.title('Best Fitness Per Generation')
+    plt.show()
