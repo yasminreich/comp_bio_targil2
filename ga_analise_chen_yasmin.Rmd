@@ -1,0 +1,130 @@
+---
+title: "GA analise"
+Authors: Chen Bistra, Yasmin Reich
+Date: 4/18/2023
+output:
+  pdf_document:
+    fig_width: 6
+    fig_height: 4
+    fig_caption: true
+---
+<center>
+# Genetic algorithem data EDA
+</center>
+
+## Authors: Chen Bistra, Yasmin Reich
+
+## Discription:
+
+We have developed a Genetic Algorithm (GA) specifically designed to break a mono-alphabetic cipher. Our GA follows these key guidelines:
+
+Initialization: We begin by creating a random population of individuals, the size of which is determined by the given population size.
+
+Evaluation: The fitness function plays a crucial role in evaluating each individual's fitness. We utilize a dictionary to check if a word exists or how closely it resembles a word in the dictionary, using the Levenshtein distance as a measure. And the 2_freq file to give the score for the too "far" words.
+
+Next Generation: The next generation function handles the selection of individuals for the next generation. Initially, natural selection takes place based on a specified death threshold. The top 5 individuals are directly transferred to the next generation. Crossover is then performed between the remaining population members and selected individuals to fill the desired population size. Finally, mutations are introduced according to a predefined mutation rate.
+
+Termination: The algorithm terminates when the best result remains unchanged for 10 consecutive generations. This criterion ensures that further iterations are not necessary as the algorithm has reached a stable solution.
+
+By employing these steps, our GA algorithm effectively breaks mono-alphabetic ciphers by iteratively improving the population through selection, crossover, and mutation, ultimately converging towards the best solution.
+
+The Lamarckian and Darwinian GAs incorporate the inclusion of n local operations, as specified by the given parameter. In both approaches, these operations are applied to assess whether they enhance the fitness of the individuals. In the Lamarckian approach, if an operation improves fitness, the individual itself is updated with the new changes. However, in the Darwinian approach, only the fitness value is updated while the individual remains unchanged. This distinction allows for a comparison between the direct modification of individuals in the Lamarckian GA and the modification of fitness values in the Darwinian GA.
+
+## Analize:
+To analyze the performance of our Genetic Algorithm (GA), we conducted a series of runs with different parameter settings. The parameters we considered are as follows:
+
+For the regular GA:
+
+Population Size: [40, 60, 80, 100]
+Mutation Chance: [0.2, 0.4, 0.6, 0.8]
+Death Threshold: [0.2, 0.4, 0.6, 0.8]
+Additionally, for the Darwinian addition, we introduced the parameter:
+
+Local Operations: [1, 3, 5]
+For the Lamarckian addition, we included the parameter:
+
+Local Operations: [5, 7, 10]
+The selection of these parameters was based on the observed ranges that demonstrated successful performance for our algorithm. As the GA involves some degree of randomness, we ran each configuration 10 times to ensure robustness in our analysis.
+
+By systematically exploring these parameter combinations and conducting multiple runs, we aimed to gain insights into the behavior and effectiveness of our GA algorithm in breaking the mono-alphabetic cipher.
+
+## Find the best parameters:
+REGULAR GA:
+After running the algorithm with the aforementioned parameters, we collected all the relevant information and stored it in a CSV file. Our objective was to identify the parameter combinations that yielded the best fitness while minimizing the number of fitness function evaluations required. To enhance the running time, we divided the data set into separate files.
+
+```{r}
+library(dplyr)
+
+file_list <- c("C:\\Users\\User\\.vscode\\comp_bio\\comp_bio_targil2\\regular_0.2.csv", "C:\\Users\\User\\.vscode\\comp_bio\\comp_bio_targil2\\regular_0.4.csv", "C:\\Users\\User\\.vscode\\comp_bio\\comp_bio_targil2\\regular_0.6.csv", "C:\\Users\\User\\.vscode\\comp_bio\\comp_bio_targil2\\regular_0.8.csv")
+
+combined_data <- do.call(rbind, lapply(file_list, read.csv))
+
+combined_data$best_fit <- as.numeric(combined_data$best_fit)
+
+sorted_data <- combined_data %>%
+  arrange(desc(best_fit), calls_to_fit)
+
+best_fit_max <- max(sorted_data$best_fit)
+filtered_data <- sorted_data %>%
+  filter(best_fit == best_fit_max)
+
+best_rows <- filtered_data[filtered_data$calls_to_fit == min(filtered_data$calls_to_fit), ]
+
+print(best_rows)
+
+```
+Now we are interested in identifying the best parameters that consistently produce the best results across all runs. We want to find the parameter set that yields the best average performance, in low variance between the results.
+```{r}
+best_combination <- combined_data %>%
+  group_by(combined_data$population_size, combined_data$motation_chance, combined_data$death_treshold) %>%
+  summarize(
+    avg_gen_num = mean(generation_num),
+    avg_best_fit = mean(best_fit),
+    best_fit_variance = var(best_fit),
+    avg_calls_to_fit = mean(calls_to_fit)
+  ) %>%
+  arrange(desc(avg_best_fit), avg_calls_to_fit)
+
+best_row <- best_combination[1, ]
+print(best_row)
+```
+
+Here, we observe that the algorithm consistently converges to the best fit on every run, as indicated by a variance of 0.
+
+DARWIN GA:
+Now, our objective is to determine the optimal parameters for the Darwin GA. To achieve this, we examined which parameter combinations resulted in the best run.
+```{r}
+
+file_list <- c("C:\\Users\\User\\.vscode\\comp_bio\\comp_bio_targil2\\darwin_0.2.csv", "C:\\Users\\User\\.vscode\\comp_bio\\comp_bio_targil2\\darwin_0.4.csv", "C:\\Users\\User\\.vscode\\comp_bio\\comp_bio_targil2\\darwin_0.6.csv", "C:\\Users\\User\\.vscode\\comp_bio\\comp_bio_targil2\\darwin_0.8.csv")
+
+combined_darwin_data <- do.call(rbind, lapply(file_list, read.csv))
+
+combined_darwin_data$best_fit <- as.numeric(combined_darwin_data$best_fit)
+
+sorted_darwin_data <- combined_darwin_data %>%
+  arrange(desc(best_fit), calls_to_fit)
+
+best_fit_max <- max(sorted_darwin_data$best_fit)
+filtered_darwin_data <- sorted_darwin_data %>%
+  filter(best_fit == best_fit_max)
+
+best_darwin_rows <- filtered_darwin_data[filtered_data$calls_to_fit == min(filtered_data$calls_to_fit), ]
+
+print(best_darwin_rows)
+```
+And again we are interested in identifying the best parameters that consistently produce the best results across all runs. We checked what is the parameters set that yields the best average performance, in low variance between the results.
+
+```{r}
+best_darwin_combination <- combined_darwin_data %>%
+  group_by(combined_darwin_data$population_size, combined_darwin_data$motation_chance, combined_darwin_data$death_treshold, combined_darwin_data$n_opt) %>%
+  summarize(
+    avg_gen_num = mean(generation_num),
+    avg_best_fit = mean(best_fit),
+    best_fit_variance = var(best_fit),
+    avg_calls_to_fit = mean(calls_to_fit)
+  ) %>%
+  arrange(desc(avg_best_fit), avg_calls_to_fit)
+
+best_darwin_row <- best_darwin_combination[1, ]
+print(best_darwin_row)
+```
